@@ -1,6 +1,7 @@
 package com.example.amanmj.inputstream_player;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,9 @@ import com.google.android.exoplayer.upstream.DataSource;
 import com.google.android.exoplayer.upstream.DefaultAllocator;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class MainActivity extends AppCompatActivity implements myInputStream.GetAvailableBytes {
@@ -64,22 +68,35 @@ public class MainActivity extends AppCompatActivity implements myInputStream.Get
         exoPlayer= ExoPlayer.Factory.newInstance(rendererCount);
 
         /*check if file is present or not*/
-        try
-        {
-            /* location of file in the root directory of SD Card named "song.mp3" */
-            file=new File(Environment.getExternalStorageDirectory(),"song.mp3");
-        }
-        catch(Exception e)
-        {
-            Toast.makeText(getApplicationContext(),"song.mp3 not found in root of SD Card",Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-            finish();
+
+        file=new File(getCacheDir(),"sample.mp3"); // location of file in the root directory of SD Card named "sample.mp3"
+
+        if (!file.exists()) {
+            try {
+                InputStream inputStream = getAssets().open("sample.mp3");
+                OutputStream outputStream = new FileOutputStream(file);
+
+                byte buffer[] = new byte[1024];
+                int read = 0;
+
+                while((read=inputStream.read(buffer)) > 0) {
+                    outputStream.write(buffer,0,read);
+                }
+
+                outputStream.close();
+                inputStream.close();
+
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "sample.mp3 could not be copied to external storage", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+                finish();
+            }
         }
 
         /*instantiate myDataSource*/
         dataSource=new myDataSource(this);
 
-        extractorSampleSource=new ExtractorSampleSource(Uri.parse("song.mp3"),dataSource,new DefaultAllocator(64*1024),64*1024*256);
+        extractorSampleSource=new ExtractorSampleSource(Uri.parse("sample.mp3"),dataSource,new DefaultAllocator(64*1024),64*1024*256);
         audio=new MediaCodecAudioTrackRenderer(extractorSampleSource,null,true);
 
         /*prepare ExoPlayer*/
@@ -90,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements myInputStream.Get
         /*start a new Thread that will determine the buffering speed of the song.
         available bytes will increase by BUFFER_BYTES*1024 after each second thus providing a buffering of
         "BUFFER_BYTES" KBPS
-        The bytes will enter myInputStream from "song.mp3" at a rate of BUFFER_BYTES KBPS.
+        The bytes will enter myInputStream from "sample.mp3" at a rate of BUFFER_BYTES KBPS.
          */
         new Thread(updateAvailableBytes).start();
 
@@ -156,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements myInputStream.Get
         temp.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v) {
-                extractorSampleSource=new ExtractorSampleSource(Uri.parse("song.mp3"),dataSource,new DefaultAllocator(64*1024),64*1024*256);
+                extractorSampleSource=new ExtractorSampleSource(Uri.parse("sample.mp3"),dataSource,new DefaultAllocator(64*1024),64*1024*256);
                 audio=new MediaCodecAudioTrackRenderer(extractorSampleSource,null,true);
                 exoPlayer.prepare(audio);
                 exoPlayer.setPlayWhenReady(true);

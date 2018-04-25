@@ -1,5 +1,6 @@
 package com.example.amanmj.inputstream_player;
 
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -32,7 +33,7 @@ public class myDataSource implements UriDataSource {
         {
             uriString = dataspec.uri.toString();
 
-            File file = new File(Environment.getExternalStorageDirectory(),uriString);
+            File file = new File(((Context) this.getAvailableBytes).getCacheDir(),uriString);
 
             RandomAccessFile randomAccessFile=new RandomAccessFile(file,"r");
             inputStream=new myInputStream(getAvailableBytes,randomAccessFile);
