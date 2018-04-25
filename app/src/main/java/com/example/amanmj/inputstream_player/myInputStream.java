@@ -1,8 +1,8 @@
 package com.example.amanmj.inputstream_player;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 
 /* My custom built InputStream */
 public class myInputStream extends InputStream {
@@ -10,11 +10,9 @@ public class myInputStream extends InputStream {
     /*keeping track of bytesRead so that we have to call getAvailableBytes() whenever bytesRead is <= 0 */
     private long numberOfBytesCanBeRead = 0;
 
-    private final GetAvailableBytes getAvailableBytes;
-    private final RandomAccessFile randomAccessFile;
+    private final FileInputStream randomAccessFile;
 
-    public myInputStream(GetAvailableBytes getAvailableBytes, RandomAccessFile randomAccessFile) {
-        this.getAvailableBytes = getAvailableBytes;
+    public myInputStream(FileInputStream randomAccessFile) {
         this.randomAccessFile = randomAccessFile;
     }
 
@@ -26,7 +24,7 @@ public class myInputStream extends InputStream {
 
         /*calculate number of bytes that can be read from myInputStream without blocking it */
 
-        numberOfBytesCanBeRead = getAvailableBytes.getAvailableBytes()-randomAccessFile.getFilePointer();
+        numberOfBytesCanBeRead = randomAccessFile.getChannel().size()-randomAccessFile.getChannel().position();
 
         /*if bytes are not available return -1 */
         if(numberOfBytesCanBeRead < 0)
@@ -42,7 +40,7 @@ public class myInputStream extends InputStream {
                 e.printStackTrace();
                 return -1;
             }
-            numberOfBytesCanBeRead = this.getAvailableBytes.getAvailableBytes()-randomAccessFile.getFilePointer();
+            numberOfBytesCanBeRead = randomAccessFile.getChannel().size()-randomAccessFile.getChannel().position();
         }
         return (int) numberOfBytesCanBeRead;
     }
@@ -92,13 +90,8 @@ public class myInputStream extends InputStream {
         long skipped = (availableBytes < byteCount) ? availableBytes : byteCount;
 
         /*return number of bytes skipped*/
-        int actualSkipped = randomAccessFile.skipBytes( (int)skipped );
+        long actualSkipped = randomAccessFile.skip(skipped);
         numberOfBytesCanBeRead -= actualSkipped;
         return actualSkipped;
-    }
-
-    /*an interface that gives us number of available bytes that we are increasing from a new thread in MainActivity*/
-    public interface GetAvailableBytes {
-        long getAvailableBytes();
     }
 }

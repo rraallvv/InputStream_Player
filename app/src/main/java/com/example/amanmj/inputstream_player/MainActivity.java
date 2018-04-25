@@ -1,9 +1,7 @@
 package com.example.amanmj.inputstream_player;
 
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -12,7 +10,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.TrackRenderer;
@@ -26,7 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class MainActivity extends AppCompatActivity implements myInputStream.GetAvailableBytes {
+public class MainActivity extends AppCompatActivity {
     private ExoPlayer exoPlayer;
     private DataSource dataSource;
     private TrackRenderer audio;
@@ -181,15 +178,6 @@ public class MainActivity extends AppCompatActivity implements myInputStream.Get
         });
     }
 
-    /*Override method in getAvailableBytes Interface in MyInputStream*/
-    @Override
-    public long getAvailableBytes() {
-        /*a check to handle if available bytes exceed the total bytes in file*/
-        if(availableBytes.get() > file.length())
-            return file.length();
-        else
-            return availableBytes.get();
-    }
     Runnable updateAvailableBytes = new Runnable() {
 
         @Override

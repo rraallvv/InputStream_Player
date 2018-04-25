@@ -1,8 +1,6 @@
 package com.example.amanmj.inputstream_player;
 
 import android.content.Context;
-import android.os.Environment;
-import android.util.Log;
 
 import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.upstream.DataSpec;
@@ -10,20 +8,20 @@ import com.google.android.exoplayer.upstream.UriDataSource;
 
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 /* my custom DataSource to read myInputStream (Similar to AssetDataSource) */
 public class myDataSource implements UriDataSource {
 
-    private myInputStream.GetAvailableBytes getAvailableBytes;
+    private Context context;
     private String uriString;
     private myInputStream inputStream;
     private long bytesRemaining;
     private boolean opened;
 
-    public myDataSource(myInputStream.GetAvailableBytes getAvailableBytes) {
-        this.getAvailableBytes = getAvailableBytes;
+    public myDataSource(Context context) {
+        this.context = context;
     }
 
     @Override
@@ -33,10 +31,10 @@ public class myDataSource implements UriDataSource {
         {
             uriString = dataspec.uri.toString();
 
-            File file = new File(((Context) this.getAvailableBytes).getCacheDir(),uriString);
+            File file = new File(context.getCacheDir(),uriString);
 
-            RandomAccessFile randomAccessFile=new RandomAccessFile(file,"r");
-            inputStream=new myInputStream(getAvailableBytes,randomAccessFile);
+            FileInputStream randomAccessFile=new FileInputStream(file);
+            inputStream=new myInputStream(randomAccessFile);
 
 
             long skipped = inputStream.skip(dataspec.position);
