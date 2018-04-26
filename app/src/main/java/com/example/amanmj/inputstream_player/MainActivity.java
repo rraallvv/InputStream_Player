@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 		DefaultRenderersFactory renderersFactorySound = new DefaultRenderersFactory(this,null, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
 		player = ExoPlayerFactory.newSimpleInstance(renderersFactorySound, new DefaultTrackSelector(), new DefaultLoadControl());
 
-		final DataSource dataSource = new myDataSource(this);
+		final DataSource dataSource = new InputStreamDataSource(this);
 		final Uri uri = Uri.parse("sample.mp3");
 		DataSpec dataSpec = new DataSpec(uri);
 		try {

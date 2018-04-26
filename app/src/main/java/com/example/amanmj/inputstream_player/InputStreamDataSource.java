@@ -10,16 +10,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-/* my custom DataSource to read myInputStream (Similar to AssetDataSource) */
-public class myDataSource implements DataSource {
+/* my custom DataSource to read InputStream (Similar to AssetDataSource) */
+public class InputStreamDataSource implements DataSource {
 
 	private Context context;
-	private myInputStream inputStream;
+	private FileInputStream inputStream;
 	private Uri uri;
 	private long bytesRemaining;
 	private boolean isOpen;
 
-	public myDataSource(Context context) {
+	public InputStreamDataSource(Context context) {
 		this.context = context;
 	}
 
@@ -30,8 +30,7 @@ public class myDataSource implements DataSource {
 
 		File file = new File(context.getCacheDir(),uri.toString());
 
-		FileInputStream randomAccessFile=new FileInputStream(file);
-		inputStream=new myInputStream(randomAccessFile);
+		inputStream=new FileInputStream(file);
 
 		if (inputStream != null) {
 			isOpen = true;
