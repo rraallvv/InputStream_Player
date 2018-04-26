@@ -3,8 +3,8 @@ package com.example.amanmj.inputstream_player;
 import android.content.Context;
 
 import com.google.android.exoplayer.C;
+import com.google.android.exoplayer.upstream.DataSource;
 import com.google.android.exoplayer.upstream.DataSpec;
-import com.google.android.exoplayer.upstream.UriDataSource;
 
 import java.io.EOFException;
 import java.io.File;
@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 /* my custom DataSource to read myInputStream (Similar to AssetDataSource) */
-public class myDataSource implements UriDataSource {
+public class myDataSource implements DataSource {
 
 	private Context context;
 	private String uriString;
@@ -95,12 +95,7 @@ public class myDataSource implements UriDataSource {
 		}
 	}
 
-	@Override
-	public String getUri() {
-		return uriString;
-	}
-
-	@Override
+    @Override
 	public void close()
 	{
 		uriString = null;
