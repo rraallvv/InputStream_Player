@@ -3,16 +3,17 @@ package com.example.amanmj.inputstream_player;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.google.android.exoplayer.ExoPlayer;
-import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
-import com.google.android.exoplayer.MediaCodecSelector;
-import com.google.android.exoplayer.TrackRenderer;
-import com.google.android.exoplayer.extractor.ExtractorSampleSource;
-import com.google.android.exoplayer.upstream.DataSource;
-import com.google.android.exoplayer.upstream.DefaultAllocator;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DataSpec;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,26 +21,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
-	private ExoPlayer exoPlayer;
-	private DataSource dataSource;
-	private TrackRenderer audio;
-	private ExtractorSampleSource extractorSampleSource;
-	private int rendererCount;
+	private SimpleExoPlayer player;
 	private File file;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		rendererCount=1;
-
-		exoPlayer= ExoPlayer.Factory.newInstance(rendererCount);
-
-		/*check if file is present or not*/
-
-		file=new File(getCacheDir(),"sample.mp3"); // location of file in the root directory of SD Card named "sample.mp3"
+		file=new File(getCacheDir(),"sample.mp3");
 
 		if (!file.exists()) {
 			try {
@@ -63,14 +53,27 @@ public class MainActivity extends AppCompatActivity {
 			}
 		}
 
-		/*instantiate myDataSource*/
-		dataSource=new myDataSource(this);
+		DefaultRenderersFactory renderersFactorySound = new DefaultRenderersFactory(this,null, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
+		player = ExoPlayerFactory.newSimpleInstance(renderersFactorySound, new DefaultTrackSelector(), new DefaultLoadControl());
 
-		extractorSampleSource=new ExtractorSampleSource(Uri.parse("sample.mp3"),dataSource,new DefaultAllocator(64*1024),64*1024*256);
-		audio=new MediaCodecAudioTrackRenderer(extractorSampleSource, MediaCodecSelector.DEFAULT,null,true);
+		final DataSource dataSource = new myDataSource(this);
+		final Uri uri = Uri.parse("sample.mp3");
+		DataSpec dataSpec = new DataSpec(uri);
+		try {
+			dataSource.open(dataSpec);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-		/*prepare ExoPlayer*/
-		exoPlayer.prepare(audio);
-		exoPlayer.setPlayWhenReady(true);
+		DataSource.Factory factoryMusic = new DataSource.Factory() {
+			@Override
+			public DataSource createDataSource() {
+				return dataSource;
+			}
+		};
+		MediaSource audioSource = new ExtractorMediaSource.Factory(factoryMusic).createMediaSource(uri, null, null);
+
+		player.prepare(audioSource);
+		player.setPlayWhenReady(true);
 	}
 }

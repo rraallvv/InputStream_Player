@@ -1,9 +1,10 @@
 package com.example.amanmj.inputstream_player;
 
 import android.content.Context;
+import android.net.Uri;
 
-import com.google.android.exoplayer.upstream.DataSource;
-import com.google.android.exoplayer.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DataSpec;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +15,7 @@ public class myDataSource implements DataSource {
 
 	private Context context;
 	private myInputStream inputStream;
-	private String uriString;
+	private Uri uri;
 	private long bytesRemaining;
 	private boolean isOpen;
 
@@ -25,9 +26,9 @@ public class myDataSource implements DataSource {
 	@Override
 	public long open(DataSpec dataspec) throws IOException
 	{
-		uriString = dataspec.uri.toString();
+		uri = dataspec.uri;
 
-		File file = new File(context.getCacheDir(),uriString);
+		File file = new File(context.getCacheDir(),uri.toString());
 
 		FileInputStream randomAccessFile=new FileInputStream(file);
 		inputStream=new myInputStream(randomAccessFile);
@@ -60,10 +61,15 @@ public class myDataSource implements DataSource {
 		}
 	}
 
+	@Override
+	public Uri getUri() {
+		return uri;
+	}
+
     @Override
 	public void close() throws IOException
 	{
-		uriString = null;
+		uri = null;
 		if (inputStream != null)
 		{
 			try
