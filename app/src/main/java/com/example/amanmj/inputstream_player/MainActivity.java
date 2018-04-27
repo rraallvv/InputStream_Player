@@ -11,6 +11,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.upstream.AssetDataSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
 
@@ -21,7 +22,7 @@ import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
 	private SimpleExoPlayer player;
-	private String filename = "sample.mp3";
+	private String filename = "sample.mp4";
 	private TextureView videoView;
 
 	@Override
@@ -59,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
 		//player = ExoPlayerFactory.newSimpleInstance(renderersFactorySound, new DefaultTrackSelector(), new DefaultLoadControl());
 		player = ExoPlayerFactory.newSimpleInstance(this, new DefaultTrackSelector());
 
-		final DataSource dataSource = new InputStreamDataSource(this);
+		//final DataSource dataSource = new InputStreamDataSource(this);
+		final DataSource dataSource = new AssetDataSource(this);
 		final Uri uri = Uri.parse(filename);
 		DataSpec dataSpec = new DataSpec(uri);
 		try {
