@@ -3,10 +3,9 @@ package com.example.amanmj.inputstream_player;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.TextureView;
 import android.widget.Toast;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -22,18 +21,21 @@ import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
 	private SimpleExoPlayer player;
-	private File file;
+	private String filename = "sample.mp3";
+	private TextureView videoView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		file=new File(getCacheDir(),"sample.mp3");
+		videoView = findViewById(R.id.videoView);
+
+		File file=new File(getCacheDir(),filename);
 
 		if (!file.exists()) {
 			try {
-				InputStream inputStream = getAssets().open("sample.mp3");
+				InputStream inputStream = getAssets().open(filename);
 				OutputStream outputStream = new FileOutputStream(file);
 
 				byte buffer[] = new byte[1024];
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 				inputStream.close();
 
 			} catch (Exception e) {
-				Toast.makeText(getApplicationContext(), "sample.mp3 could not be copied to external storage", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), filename + " could not be copied to external storage", Toast.LENGTH_SHORT).show();
 				e.printStackTrace();
 				finish();
 			}
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 		player = ExoPlayerFactory.newSimpleInstance(this, new DefaultTrackSelector());
 
 		final DataSource dataSource = new InputStreamDataSource(this);
-		final Uri uri = Uri.parse("sample.mp3");
+		final Uri uri = Uri.parse(filename);
 		DataSpec dataSpec = new DataSpec(uri);
 		try {
 			dataSource.open(dataSpec);
@@ -66,15 +68,17 @@ public class MainActivity extends AppCompatActivity {
 			e.printStackTrace();
 		}
 
-		DataSource.Factory factoryMusic = new DataSource.Factory() {
+		DataSource.Factory dataSourcefactory = new DataSource.Factory() {
 			@Override
 			public DataSource createDataSource() {
 				return dataSource;
 			}
 		};
-		MediaSource audioSource = new ExtractorMediaSource.Factory(factoryMusic).createMediaSource(uri, null, null);
+		MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourcefactory).createMediaSource(uri, null, null);
 
-		player.prepare(audioSource);
+		player.setVideoTextureView(videoView);
+
+		player.prepare(mediaSource);
 		player.setPlayWhenReady(true);
 	}
 }
