@@ -55,12 +55,9 @@ public class MainActivity extends AppCompatActivity {
 			}
 		}
 
-		//DefaultRenderersFactory renderersFactorySound = new DefaultRenderersFactory(this,null, DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
-		//player = ExoPlayerFactory.newSimpleInstance(renderersFactorySound, new DefaultTrackSelector(), new DefaultLoadControl());
 		player = ExoPlayerFactory.newSimpleInstance(this, new DefaultTrackSelector());
 
-		//final DataSource dataSource = new InputStreamDataSource(this);
-		final DataSource dataSource = new AssetDataSource(this);
+		final DataSource dataSource = new InputStreamDataSource(this);
 		final Uri uri = Uri.parse(filename);
 		DataSpec dataSpec = new DataSpec(uri);
 		try {
