@@ -16,7 +16,6 @@
 package com.example.amanmj.inputstream_player;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.net.Uri;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -24,6 +23,8 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.TransferListener;
 
 import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -43,7 +44,7 @@ public final class AssetDataSource implements DataSource {
 
 	}
 
-	private final AssetManager assetManager;
+	private final Context context;
 	private final TransferListener<? super AssetDataSource> listener;
 
 	private Uri uri;
@@ -63,21 +64,18 @@ public final class AssetDataSource implements DataSource {
 	 * @param listener An optional listener.
 	 */
 	public AssetDataSource(Context context, TransferListener<? super AssetDataSource> listener) {
-		this.assetManager = context.getAssets();
 		this.listener = listener;
+		this.context = context;
 	}
 
 	@Override
 	public long open(DataSpec dataSpec) throws AssetDataSourceException {
 		try {
 			uri = dataSpec.uri;
-			String path = uri.getPath();
-			if (path.startsWith("/android_asset/")) {
-				path = path.substring(15);
-			} else if (path.startsWith("/")) {
-				path = path.substring(1);
-			}
-			inputStream = assetManager.open(path, AssetManager.ACCESS_RANDOM);
+
+			File file = new File(context.getCacheDir(), uri.toString());
+			inputStream = new FileInputStream(file);
+
 			long skipped = inputStream.skip(dataSpec.position);
 			if (skipped < dataSpec.position) {
 				// assetManager.open() returns an AssetInputStream, whose skip() implementation only skips
