@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.TextureView;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -59,12 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
 		final DataSource dataSource = new InputStreamDataSource(this);
 		final Uri uri = Uri.parse(filename);
-		DataSpec dataSpec = new DataSpec(uri);
-		try {
-			dataSource.open(dataSpec);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 		DataSource.Factory dataSourcefactory = new DataSource.Factory() {
 			@Override
@@ -77,6 +72,12 @@ public class MainActivity extends AppCompatActivity {
 		player.setVideoTextureView(videoView);
 
 		player.prepare(mediaSource);
+		player.setPlayWhenReady(true);
+	}
+
+	public void onPlay(View view) {
+		player.setPlayWhenReady(false);
+		player.seekTo(0);
 		player.setPlayWhenReady(true);
 	}
 }
